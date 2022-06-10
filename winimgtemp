@@ -1,0 +1,32 @@
+{ 
+    "type": "Microsoft.VirtualMachineImages/imageTemplates", 
+    "apiVersion": "2021-10-01", 
+    "location": "<region>", 
+    "tags": {
+      "<name>": "<value>",
+      "<name>": "<value>"
+    },
+    "identity": {},			 
+    "properties": {
+      "buildTimeoutInMinutes": <minutes>, 
+      "stagingResourceGroup": "/subscriptions/<subscriptionID>/resourceGroups/<stagingResourceGroupName>",
+      "vmProfile": {
+        "vmSize": "<vmSize>",
+        "proxyVmSize": "<vmSize>",
+        "osDiskSizeGB": <sizeInGB>,
+        "vnetConfig": {
+          "subnetId": "/subscriptions/<subscriptionID>/resourceGroups/<vnetRgName>/providers/Microsoft.Network/virtualNetworks/<vnetName>/subnets/<subnetName>"
+        },
+	"userAssignedIdentities": [
+          "/subscriptions/<subscriptionID>/resourceGroups/<identityRgName>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/<identityName1>",
+	  "/subscriptions/<subscriptionID>/resourceGroups/<identityRgName>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/<identityName2>",
+	  "/subscriptions/<subscriptionID>/resourceGroups/<identityRgName>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/<identityName3>",
+	  ...
+      ]
+      },
+      "source": {}, 
+      "customize": [], 
+      "validate": {},
+      "distribute": [] 
+    } 
+  }

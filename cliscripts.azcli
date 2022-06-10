@@ -1,0 +1,62 @@
+#Scrapbook that contains all the Az CLI commands required for prerequisites of AIB
+
+# Find current subscription
+Az account show
+
+# Run to check installed providers
+az provider show -n Microsoft.VirtualMachineImages | grep registrationState
+az provider show -n Microsoft.KeyVault | grep registrationState
+az provider show -n Microsoft.Compute | grep registrationState
+az provider show -n Microsoft.Storage | grep registrationState
+az provider show -n Microsoft.Network | grep registrationState
+
+# run to register uninstalled providers
+az provider register -n Microsoft.VirtualMachineImages
+az provider register -n Microsoft.Compute
+az provider register -n Microsoft.KeyVault
+az provider register -n Microsoft.Storage
+az provider register -n Microsoft.Network
+
+# Resource group name - we are using myImageBuilderRG in this example
+imageResourceGroup=AVD-img-RG
+# Region location 
+location=eastus
+# Run output name
+runOutputName=aibWindows
+# name of the image to be created
+imageName=avdWinImage
+
+# Variable for subscription ID
+subscriptionID=$(az account show --query id --output tsv)
+
+# Create Resource Group
+az group create -n $imageResourceGroup -l $location
+
+# create user assigned identity for image builder to access the storage account where the script is located
+identityName=aibBuiUserId$(date +'%s')
+az identity create -g $imageResourceGroup -n $identityName
+
+# get identity id
+imgBuilderCliId=$(az identity show -g $imageResourceGroup -n $identityName --query clientId -o tsv)
+
+# get the user identity URI, needed for the template
+imgBuilderId=/subscriptions/$subscriptionID/resourcegroups/$imageResourceGroup/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$identityName
+
+# download preconfigured role definition example
+curl https://raw.githubusercontent.com/azure/azvmimagebuilder/master/solutions/12_Creating_AIB_Security_Roles/aibRoleImageCreation.json -o aibRoleImageCreation.json
+
+imageRoleDefName="Azure Image Builder Image Def"$(date +'%s')
+
+# update the definition
+sed -i -e "s/<subscriptionID>/$subscriptionID/g" aibRoleImageCreation.json
+sed -i -e "s/<rgName>/$imageResourceGroup/g" aibRoleImageCreation.json
+sed -i -e "s/Azure Image Builder Service Image Creation Role/$imageRoleDefName/g" aibRoleImageCreation.json
+
+# create role definitions
+az role definition create --role-definition ./aibRoleImageCreation.json
+
+# grant role definition to the user assigned identity
+az role assignment create \
+    --assignee $imgBuilderCliId \
+    --role "$imageRoleDefName" \
+    --scope /subscriptions/$subscriptionID/resourceGroups/$imageResourceGroup
