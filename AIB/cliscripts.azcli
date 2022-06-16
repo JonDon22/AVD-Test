@@ -18,9 +18,9 @@ az provider register -n Microsoft.Storage
 az provider register -n Microsoft.Network
 
 # Resource group name - we are using myImageBuilderRG in this example
-imageResourceGroup=AVD-img-RG
+imageResourceGroup=AVD-Img-RG
 # Region location 
-location=eastus
+location=uksouth
 # Run output name
 runOutputName=aibWindows
 # name of the image to be created
@@ -60,3 +60,22 @@ az role assignment create \
     --assignee $imgBuilderCliId \
     --role "$imageRoleDefName" \
     --scope /subscriptions/$subscriptionID/resourceGroups/$imageResourceGroup
+
+# download example Image Configuration Template
+curl https://raw.githubusercontent.com/azure/azvmimagebuilder/master/quickquickstarts/0_Creating_a_Custom_Windows_Managed_Image/helloImageTemplateWin.json -o helloImageTemplateWin.json
+
+# updates the template with my sub/rg info
+sed -i -e "s/<subscriptionID>/$subscriptionID/g" helloImageTemplateWin.json
+sed -i -e "s/<rgName>/$imageResourceGroup/g" helloImageTemplateWin.json
+sed -i -e "s/<region>/$location/g" helloImageTemplateWin.json
+sed -i -e "s/<imageName>/$imageName/g" helloImageTemplateWin.json
+sed -i -e "s/<runOutputName>/$runOutputName/g" helloImageTemplateWin.json
+sed -i -e "s%<imgBuilderId>%$imgBuilderId%g" helloImageTemplateWin.json
+
+# creates template image
+az resource create \
+    --resource-group $imageResourceGroup \
+    --properties @helloImageTemplateWin.json \
+    --is-full-object \
+    --resource-type Microsoft.VirtualMachineImages/imageTemplates \
+    -n helloImageTemplateWin01
