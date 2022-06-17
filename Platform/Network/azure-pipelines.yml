@@ -12,7 +12,7 @@ pool:
 steps:
 - task: AzureCLI@2
   inputs:
-    azureSubscription: 'Visual Studio Enterprise Subscription'
+    azureSubscription: $(ServiceConnectionName)
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: 
