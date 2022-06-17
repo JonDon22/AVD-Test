@@ -1,0 +1,2 @@
+$AVD-Test-VNet-RG
+az group deployment create --resource-group VM-Ext-LA-Test-02 --template-file azuredeploy.json --parameters parameters.azuredeploy.json
