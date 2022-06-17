@@ -8,17 +8,17 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
+
 jobs:
 - job:
   steps:
-steps:
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: $(ServiceConnectionName)
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: 
-      az group deployment create
-       --resource-group $(ResourceGroupName) \
-        --template-file azuredeploy.json \
-        --parameters parameters.azuredeploy.json
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: $(ServiceConnectionName)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: 
+          az group deployment create
+           --resource-group $(ResourceGroupName) \
+           --template-file azuredeploy.json \
+           --parameters parameters.azuredeploy.json
