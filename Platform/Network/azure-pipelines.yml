@@ -8,7 +8,9 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-
+jobs:
+- job:
+  steps:
 steps:
 - task: AzureCLI@2
   inputs:
